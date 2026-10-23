@@ -1,64 +1,58 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Register.css";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Register.css';
 
 const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
+    username: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: ''
   });
 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-
-    const registerUrl = "/djangoapp/register";
+    setErrorMessage('');
 
     try {
-      const response = await fetch(registerUrl, {
-        method: "POST",
+      const response = await fetch('http://localhost:8000/djangoapp/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           username: formData.username,
           first_name: formData.first_name,
           last_name: formData.last_name,
           email: formData.email,
-          password: formData.password,
-        }),
+          password: formData.password
+        })
       });
 
       const data = await response.json();
 
-      if (response.status === 201 && data.status === "Registered") {
-        // Persist the session details and redirect to the home page
-        localStorage.setItem("username", data.username);
-        localStorage.setItem("authToken", data.token);
-        navigate("/");
+      if (response.status === 201 && data.status === 'authenticated') {
+        sessionStorage.setItem('username', data.username);
+        sessionStorage.setItem('isAuthenticated', true);
+        navigate('/dealers');
       } else {
-        setErrorMessage(
-          data.message || "Registration failed. Please try again."
-        );
+        setErrorMessage(data.error || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      setErrorMessage(
-        "Unable to connect to the server. Please try again later."
-      );
+      setErrorMessage('Unable to connect to the server. Please try again later.');
     }
   };
 
@@ -77,67 +71,67 @@ const Register = () => {
         )}
 
         <form onSubmit={handleSubmit} className="register-form">
-          <div className="form-field">
+          <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
               name="username"
-              placeholder="Enter your username"
               value={formData.username}
               onChange={handleChange}
+              placeholder="Enter a username"
               required
             />
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
             <label htmlFor="first_name">First Name</label>
             <input
               type="text"
               id="first_name"
               name="first_name"
-              placeholder="Enter your first name"
               value={formData.first_name}
               onChange={handleChange}
+              placeholder="Enter your first name"
               required
             />
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
             <label htmlFor="last_name">Last Name</label>
             <input
               type="text"
               id="last_name"
               name="last_name"
-              placeholder="Enter your last name"
               value={formData.last_name}
               onChange={handleChange}
+              placeholder="Enter your last name"
               required
             />
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
               name="email"
-              placeholder="Enter your email address"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter your email address"
               required
             />
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               name="password"
-              placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Enter a password"
               required
             />
           </div>
@@ -147,8 +141,8 @@ const Register = () => {
           </button>
         </form>
 
-        <p className="register-login-link">
-          Already have an account? <Link to="/login">Login</Link>
+        <p className="register-footer">
+          Already have an account? <Link to="/login">Login here</Link>
         </p>
       </div>
     </div>
