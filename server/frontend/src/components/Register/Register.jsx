@@ -1,165 +1,148 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-} from "@mui/material";
 import "./Register.css";
-
-const djangoHost = process.env.REACT_APP_DJANGO_HOST || "http://localhost:8000";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  // Five input fields for the Sign-up page
-  const [username, setUsername] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleRegister = async (event) => {
-    event.preventDefault();
-    setErrorMessage("");
+  const [message, setMessage] = useState("");
 
-    const registerURL = `${djangoHost}/djangoapp/register`;
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
     try {
-      const res = await fetch(registerURL, {
+      const res = await fetch("/djangoapp/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          password: password,
+          username: formData.username,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          password: formData.password,
         }),
       });
 
-      const json = await res.json();
+      const data = await res.json();
 
-      if (res.status === 201) {
-        // On successful registration, store the user details and log them in
-        localStorage.setItem("username", json.username);
-        if (json.token) {
-          localStorage.setItem("authToken", json.token);
-        }
-        navigate("/");
+      if (res.status === 201 && data.status === "Registered") {
+        // Store the username in session storage and redirect to the dealers page
+        sessionStorage.setItem("username", formData.username);
+        sessionStorage.setItem("firstname", formData.first_name);
+        navigate("/djangoapp/dealers");
+      } else if (data.error === "Already Registered") {
+        setMessage("The username is already registered. Please choose a different username.");
       } else {
-        setErrorMessage(
-          json.error || "Registration failed. Please try again."
-        );
+        setMessage(data.error || "Registration failed. Please try again.");
       }
     } catch (error) {
-      setErrorMessage("Network error. Please try again later.");
+      setMessage("An error occurred while registering. Please try again.");
     }
   };
 
   return (
     <div className="register-container">
-      <Card className="register-card" sx={{ maxWidth: 450, margin: "auto", mt: 6 }}>
-        <CardContent>
-          <Typography variant="h5" component="h1" align="center" gutterBottom>
-            Sign Up
-          </Typography>
-          <Typography
-            variant="body2"
-            align="center"
-            color="textSecondary"
-            gutterBottom
-          >
-            Create your Best Cars Dealership account
-          </Typography>
+      <div className="register-card">
+        <h1 className="register-title">Sign Up</h1>
+        <p className="register-subtitle">
+          Create your account to review dealers and post reviews.
+        </p>
 
-          <form onSubmit={handleRegister}>
-            <TextField
-              fullWidth
-              required
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
               id="username"
               name="username"
-              label="Username"
-              variant="outlined"
-              margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <TextField
-              fullWidth
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Enter a username"
               required
-              id="firstName"
-              name="firstName"
-              label="First Name"
-              variant="outlined"
-              margin="normal"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
             />
-            <TextField
-              fullWidth
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="first_name">First Name</label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              placeholder="Enter your first name"
               required
-              id="lastName"
-              name="lastName"
-              label="Last Name"
-              variant="outlined"
-              margin="normal"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
             />
-            <TextField
-              fullWidth
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="last_name">Last Name</label>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              placeholder="Enter your last name"
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
               id="email"
               name="email"
-              label="Email"
-              type="email"
-              variant="outlined"
-              margin="normal"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              fullWidth
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email address"
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
               id="password"
               name="password"
-              label="Password"
-              type="password"
-              variant="outlined"
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter a password"
+              required
             />
+          </div>
 
-            {errorMessage && (
-              <Alert severity="error" sx={{ mt: 2 }}>
-                {errorMessage}
-              </Alert>
-            )}
+          {message && <p className="register-message">{message}</p>}
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Register
-            </Button>
-          </form>
+          <button type="submit" className="register-button">
+            Register
+          </button>
+        </form>
 
-          <Typography variant="body2" align="center">
-            Already have an account? <Link to="/login">Login</Link>
-          </Typography>
-        </CardContent>
-      </Card>
+        <p className="register-login-link">
+          Already have an account? <Link to="/djangoapp/login">Login here</Link>
+        </p>
+      </div>
     </div>
   );
 };
