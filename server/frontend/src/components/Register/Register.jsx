@@ -1,73 +1,82 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import "./Register.css";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Register.css';
 
 const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
+    username: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: ''
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
-      const res = await fetch("http://localhost:8000/djangoapp/register", {
-        method: "POST",
+      const response = await fetch('http://localhost:8000/djangoapp/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/json'
         },
-        body: new URLSearchParams(formData).toString(),
+        body: JSON.stringify({
+          username: formData.username,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          password: formData.password
+        })
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (res.status === 200 && data.status === "Registered") {
-        sessionStorage.setItem("username", data.username);
-        setSuccess("Registration successful! Redirecting to home page...");
+      if (response.status === 200 && data.status === 'success') {
+        sessionStorage.setItem('username', data.username);
+        setSuccessMessage('Registration successful! Redirecting to home page...');
         setTimeout(() => {
-          navigate("/");
+          navigate('/');
         }, 1500);
       } else {
-        setError(
-          data.error ||
-            "Registration failed. The username may already exist. Please try again."
-        );
+        setErrorMessage(data.message || 'Registration failed. The username may already exist.');
       }
-    } catch (err) {
-      setError("Unable to connect to the server. Please try again later.");
+    } catch (error) {
+      setErrorMessage('Unable to connect to the server. Please try again later.');
     }
   };
 
   return (
     <div className="register-container">
+      <nav className="register-navbar">
+        <Link to="/" className="navbar-brand">DealershipX</Link>
+        <div className="navbar-links">
+          <Link to="/">Home</Link>
+          <Link to="/login">Login</Link>
+        </div>
+      </nav>
+
       <div className="register-card">
-        <h2 className="register-title">Sign Up</h2>
-        <p className="register-subtitle">
-          Create your Best Cars Dealership account to review dealers
-        </p>
+        <h2>Sign Up</h2>
+        <p className="register-subtitle">Create your account to review dealerships</p>
 
-        {error && <div className="register-error">{error}</div>}
-        {success && <div className="register-success">{success}</div>}
+        {errorMessage && <div className="alert alert-error">{errorMessage}</div>}
+        {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
-        <form className="register-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
@@ -134,9 +143,7 @@ const Register = () => {
             />
           </div>
 
-          <button type="submit" className="register-button">
-            Register
-          </button>
+          <button type="submit" className="register-button">Register</button>
         </form>
 
         <p className="register-footer">
