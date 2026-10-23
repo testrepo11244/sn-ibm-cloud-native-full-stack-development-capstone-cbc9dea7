@@ -1,155 +1,150 @@
-import React, { Component } from 'react';
-import Header from '../Header/Header';
-import { Link } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./Register.css";
 
-class Register extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: '',
-      first_name: '',
-      last_name: '',
-      email: '',
-      password: '',
-      registration_error: false,
-      error_message: '',
-      registered: false
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+const Register = () => {
+  const navigate = useNavigate();
 
-  handleChange(event) {
-    this.setState({ [event.target.name]: event.target.value });
-  }
+  const [formData, setFormData] = useState({
+    username: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
 
-  handleSubmit(event) {
-    event.preventDefault();
-    const data = {
-      username: this.state.username,
-      first_name: this.state.first_name,
-      last_name: this.state.last_name,
-      email: this.state.email,
-      password: this.state.password
-    };
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-    fetch(`${this.props.server_url}/djangoapp/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          this.setState({
-            registered: true,
-            registration_error: false
-          });
-        } else {
-          this.setState({
-            registration_error: true,
-            error_message: 'Registration failed. The username or email may already be in use.'
-          });
-        }
-      })
-      .catch((error) => {
-        console.log('Registration error: ', error);
-        this.setState({
-          registration_error: true,
-          error_message: 'An error occurred while connecting to the server. Please try again.'
-        });
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch("http://localhost:8000/djangoapp/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(formData).toString(),
       });
-  }
 
-  render() {
-    return (
-      <div>
-        <Header />
-        <div className="register-wrapper">
-          <h1>Sign Up</h1>
-          <p className="register-subtitle">
-            Create your Best Cars Dealership account to review dealers and post reviews.
-          </p>
+      const data = await res.json();
 
-          {this.state.registered ? (
-            <div className="success-message">
-              <p>Registration successful! You can now log in with your credentials.</p>
-              <Link to="/login" className="login-redirect-link">Go to Login</Link>
-            </div>
-          ) : (
-            <form className="register-form" onSubmit={this.handleSubmit}>
-              <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                placeholder="Enter your username"
-                value={this.state.username}
-                onChange={this.handleChange}
-                required
-              />
+      if (res.status === 200 && data.status === "Registered") {
+        sessionStorage.setItem("username", data.username);
+        setSuccess("Registration successful! Redirecting to home page...");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } else {
+        setError(
+          data.error ||
+            "Registration failed. The username may already exist. Please try again."
+        );
+      }
+    } catch (err) {
+      setError("Unable to connect to the server. Please try again later.");
+    }
+  };
 
-              <label htmlFor="first_name">First Name</label>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                placeholder="Enter your first name"
-                value={this.state.first_name}
-                onChange={this.handleChange}
-                required
-              />
+  return (
+    <div className="register-container">
+      <div className="register-card">
+        <h2 className="register-title">Sign Up</h2>
+        <p className="register-subtitle">
+          Create your Best Cars Dealership account to review dealers
+        </p>
 
-              <label htmlFor="last_name">Last Name</label>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                placeholder="Enter your last name"
-                value={this.state.last_name}
-                onChange={this.handleChange}
-                required
-              />
+        {error && <div className="register-error">{error}</div>}
+        {success && <div className="register-success">{success}</div>}
 
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email address"
-                value={this.state.email}
-                onChange={this.handleChange}
-                required
-              />
+        <form className="register-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Enter a username"
+              required
+            />
+          </div>
 
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Enter your password"
-                value={this.state.password}
-                onChange={this.handleChange}
-                required
-              />
+          <div className="form-group">
+            <label htmlFor="first_name">First Name</label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+              required
+            />
+          </div>
 
-              {this.state.registration_error && (
-                <p className="error-message">{this.state.error_message}</p>
-              )}
+          <div className="form-group">
+            <label htmlFor="last_name">Last Name</label>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
 
-              <button type="submit" className="register-button">Register</button>
-            </form>
-          )}
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email address"
+              required
+            />
+          </div>
 
-          <p className="login-link">
-            Already have an account? <Link to="/login">Login here</Link>
-          </p>
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter a password"
+              minLength="6"
+              required
+            />
+          </div>
+
+          <button type="submit" className="register-button">
+            Register
+          </button>
+        </form>
+
+        <p className="register-footer">
+          Already have an account? <Link to="/login">Login here</Link>
+        </p>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Register;
