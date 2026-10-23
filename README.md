@@ -1,162 +1,116 @@
-# Full Stack Application Development Capstone Project
+# Full Stack Car Dealership Application
 
 ## Repository Name
-**fullstack-capstone-dealership**
+**fullstack-car-dealership**
 
 ## Project Name
-**Best Cars Dealership — Full Stack Django & React Web Application**
+**Dealership — Full Stack Car Dealership Web Application (Django + React)**
 
 ---
 
-## Overview
-
-Best Cars Dealership is a full-stack web application developed as the final capstone
-project for the **IBM Full Stack Application Development Capstone Project** course.
+## Project Overview
+Dealership is a full-stack web application developed as the capstone project for the
+*Full Stack Application Development Capstone Project* course (IBM Skills Network).
 The application allows users to browse car dealerships, filter dealers by state,
 view dealer details and customer reviews, perform sentiment analysis on reviews,
-register/login, and post their own reviews for a dealership.
+register/login, and post reviews for dealers.
 
-The backend is built with **Django** and **Django REST Framework**, the frontend is
-built with **React**, the application is containerized with **Docker**, and it is
-deployed to **IBM Cloud Code Engine** through a **GitHub Actions CI/CD pipeline**.
+## Technology Stack
+| Layer            | Technology                                   |
+|------------------|----------------------------------------------|
+| Frontend         | React.js, React Router, CSS                  |
+| Backend          | Django, Django REST Framework                |
+| Database         | SQLite (development) / MongoDB (cloud)       |
+| Microservices    | Node.js/Express (Dealers & Reviews), Sentiment Analysis (Flask) |
+| Authentication   | Django Auth (session + token based)          |
+| CI/CD            | GitHub Actions                               |
+| Deployment       | IBM Cloud Code Engine                        |
 
----
-
-## Features
-
-- **Dealership listing** — view all dealers or filter dealers by state
-- **Dealer details** — view dealer information along with all posted reviews
-- **User authentication** — Sign-up, Login, and Logout (Django auth + session cookies)
-- **Post reviews** — authenticated users can review a dealership
-- **Sentiment analysis** — reviews are analyzed (positive / negative / neutral) using IBM Watson NLU
-- **Static pages** — custom "About Us" and "Contact Us" pages
-- **Admin panel** — Django admin for managing dealers, cars, and reviews
-- **CI/CD** — automated build, test, and deployment via GitHub Actions
-
----
-
-## Tech Stack
-
-| Layer      | Technology                          |
-|------------|-------------------------------------|
-| Frontend   | React, React Router, CSS            |
-| Backend    | Python, Django, Django REST Framework, SQLite |
-| NLU        | IBM Watson Natural Language Understanding |
-| Container  | Docker, docker-compose              |
-| CI/CD      | GitHub Actions                      |
-| Deployment | IBM Cloud Code Engine               |
-
----
+## Key Features
+- View all car dealerships on the home page
+- Filter dealerships by state
+- View dealer details along with customer reviews
+- Sentiment analysis (positive/negative/neutral) of reviews
+- User sign-up, login, and logout
+- Post a review for a dealer (logged-in users only)
+- Admin panel for managing dealers, cars, and reviews
+- CI/CD pipeline with GitHub Actions and deployment to IBM Cloud Code Engine
 
 ## Project Structure
-
 ```
-fullstack-capstone-dealership/
+fullstack-car-dealership/
 ├── server/
 │   ├── djangoapp/                 # Django application (models, views, templates, static)
 │   │   ├── static/
 │   │   │   ├── About.html
-│   │   │   └── Contact.html
-│   │   ├── templates/djangoapp/   # Django templates (index, dealer details, reviews)
-│   │   ├── models.py
+│   │   │   ├── Contact.html
+│   │   ├── src/                   # React source code
+│   │   │   └── components/
+│   │   │       ├── Register/Register.jsx
+│   │   │       ├── Login/Login.jsx
+│   │   │       ├── Dealers/Dealers.jsx
+│   │   │       ├── Dealer/Dealer.jsx
+│   │   │       └── PostReview/PostReview.jsx
 │   │   ├── views.py
-│   │   ├── restapis.py
-│   │   └── urls.py
+│   │   ├── models.py
+│   │   ├── urls.py
 │   ├── server/                    # Django project settings
-│   ├── frontend/                  # React application
-│   │   ├── src/
-│   │   │   ├── components/
-│   │   │   │   ├── Register/Register.jsx
-│   │   │   │   ├── Login/Login.jsx
-│   │   │   │   ├── Dealers/Dealers.jsx
-│   │   │   │   ├── Dealer/Dealer.jsx
-│   │   │   │   ├── PostReview/PostReview.jsx
-│   │   │   │   └── ...
-│   │   │   └── App.js
-│   │   └── package.json
 │   ├── manage.py
 │   ├── requirements.txt
 │   ├── Dockerfile
-│   └── .github/workflows/cicd.yml
-├── database/
-│   └── data.sqlite
-└── README.md
+├── .github/workflows/server.yml   # GitHub Actions CI/CD workflow
+├── README.md
 ```
 
----
-
 ## Prerequisites
-
 - Python 3.9+
-- Node.js 16+
-- Docker (optional, for containerized deployment)
-- An IBM Cloud API key with Watson NLU provisioned (for sentiment analysis)
+- Node.js 14+
+- Django 4.x
+- Git
 
----
+## Installation and Setup
+```bash
+# Clone the repository
+git clone https://github.com/<your-username>/fullstack-car-dealership.git
+cd fullstack-car-dealership/server
 
-## Installation & Local Setup
+# Install Python dependencies
+pip install -r requirements.txt
 
-1. **Clone the repository**
+# Run database migrations
+python manage.py makemigrations
+python manage.py migrate
 
-   ```bash
-   git clone https://github.com/<your-github-username>/fullstack-capstone-dealership.git
-   cd fullstack-capstone-dealership
-   ```
+# Build the React frontend
+cd frontend
+npm install
+npm run build
 
-2. **Backend setup**
+# Start the Django development server
+cd ..
+python manage.py runserver
+```
 
-   ```bash
-   cd server
-   pip install -r requirements.txt
-   python manage.py migrate
-   python manage.py runserver
-   ```
+The application will be available at `http://localhost:8000/`.
 
-   The Django server starts at `http://127.0.0.1:8000/`.
+## API Endpoints
+| Endpoint                        | Method | Description                          |
+|---------------------------------|--------|--------------------------------------|
+| `/djangoapp/register`           | POST   | Register a new user                  |
+| `/djangoapp/login`              | POST   | Login an existing user               |
+| `/djangoapp/logout`             | GET    | Logout the current user              |
+| `/djangoapp/get_dealers/`       | GET    | Get all dealers                      |
+| `/djangoapp/get_dealers/<state>`| GET    | Get dealers filtered by state        |
+| `/djangoapp/dealer/<id>`        | GET    | Get dealer details by ID             |
+| `/djangoapp/reviews/dealer/<id>`| GET    | Get reviews for a dealer             |
+| `/djangoapp/add_review`         | POST   | Post a review for a dealer           |
+| `/djangoapp/analyze_review`     | POST   | Sentiment analysis of review text    |
 
-3. **Frontend setup**
-
-   ```bash
-   cd server/frontend
-   npm install
-   npm start
-   ```
-
-   The React app starts at `http://localhost:3000/`.
-
----
-
-## Key API Endpoints
-
-| Endpoint                          | Method | Description                          |
-|-----------------------------------|--------|--------------------------------------|
-| `/djangoapp/register`             | POST   | Register a new user                  |
-| `/djangoapp/login`                | POST   | Log in an existing user              |
-| `/djangoapp/logout`               | GET    | Log out the current user             |
-| `/djangoapp/get_dealers/`         | GET    | Fetch all dealers                    |
-| `/djangoapp/get_dealers/<state>`  | GET    | Fetch dealers filtered by state      |
-| `/djangoapp/dealer/<dealer_id>`   | GET    | Fetch a dealer by ID                 |
-| `/djangoapp/reviews/dealer/<id>`  | GET    | Fetch all reviews for a dealer       |
-| `/djangoapp/add_review`           | POST   | Post a review for a dealer           |
-| `/djangoapp/analyze_review`       | POST   | Run sentiment analysis on review text|
-| `/djangoapp/get_cars`             | GET    | Fetch all car makes and models       |
-
----
-
-## CI/CD & Deployment
-
-The GitHub Actions workflow (`.github/workflows/cicd.yml`) automatically:
-
-1. Installs dependencies and runs the Django test suite
-2. Builds the Docker image for the server
-3. Pushes the image to IBM Cloud Container Registry
-4. Deploys the updated image to IBM Cloud Code Engine
-
-The deployed application URL is stored in the `deploymentURL` file in this repository.
-
----
+## CI/CD and Deployment
+The GitHub Actions workflow (`.github/workflows/server.yml`) builds the React app,
+runs the Django checks, builds the Docker image, and deploys the container to
+**IBM Cloud Code Engine** on every push to the `main` branch.
 
 ## Author
-
-Capstone project completed for the IBM Full Stack Application Development
-Professional Certificate.
+Capstone project submitted for the IBM Full Stack Application Development
+Capstone Project course.
