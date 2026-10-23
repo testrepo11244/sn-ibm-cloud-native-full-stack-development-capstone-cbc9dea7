@@ -10,153 +10,145 @@ const Register = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: ""
+    password: "",
   });
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { userName, firstName, lastName, email, password } = formData;
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    if (!userName || !firstName || !lastName || !email || !password) {
-      setErrorMessage("All fields are required.");
-      return;
-    }
+    const registerUrl = `${process.env.REACT_APP_DJANGO_API_URL}/djangoapp/register`;
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/djangoapp/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userName: userName,
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: password
-          })
-        }
-      );
+      const res = await fetch(registerUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName: formData.userName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (response.status === 201 && data.userName) {
-        // Store the authenticated user in session storage
-        sessionStorage.setItem("username", data.userName);
-        sessionStorage.setItem("authenticated", "true");
-        // Redirect to the dealers home page after successful registration
+      if (res.status === 201) {
+        // Registration successful — store the session info and go to the home page
+        localStorage.setItem("username", data.userName);
+        localStorage.setItem("isAuthenticated", true);
         navigate("/");
-      } else {
+      } else if (res.status === 409) {
         setErrorMessage(
-          data.error || "Registration failed. The username may already exist."
+          "The username already exists. Please choose a different username."
         );
+      } else {
+        setErrorMessage(data.error || "Registration failed. Please try again.");
       }
     } catch (error) {
-      setErrorMessage("Unable to reach the server. Please try again later.");
+      setErrorMessage("Network error. Please try again later.");
     }
   };
 
   return (
-    <div className="register-wrapper">
-      <div className="register-card">
-        <h1 className="register-title">Sign Up</h1>
-        <p className="register-subtitle">
-          Create your Best Cars Dealership account to review dealers.
+    <div className="register_container">
+      <div className="register_form_card">
+        <h2 className="register_title">Sign Up</h2>
+        <p className="register_subtitle">
+          Create your account to review dealerships
         </p>
 
-        {errorMessage && (
-          <div className="register-error" role="alert">
-            {errorMessage}
-          </div>
-        )}
-
-        <form className="register-form" onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form onSubmit={handleSubmit}>
+          <div className="input_field">
             <label htmlFor="userName">Username</label>
             <input
               type="text"
               id="userName"
               name="userName"
-              className="form-input"
-              value={userName}
+              placeholder="Enter username"
+              value={formData.userName}
               onChange={handleChange}
-              placeholder="Enter a username"
               required
             />
           </div>
 
-          <div className="form-group">
+          <div className="input_field">
             <label htmlFor="firstName">First Name</label>
             <input
               type="text"
               id="firstName"
               name="firstName"
-              className="form-input"
-              value={firstName}
+              placeholder="Enter first name"
+              value={formData.firstName}
               onChange={handleChange}
-              placeholder="Enter your first name"
               required
             />
           </div>
 
-          <div className="form-group">
+          <div className="input_field">
             <label htmlFor="lastName">Last Name</label>
             <input
               type="text"
               id="lastName"
               name="lastName"
-              className="form-input"
-              value={lastName}
+              placeholder="Enter last name"
+              value={formData.lastName}
               onChange={handleChange}
-              placeholder="Enter your last name"
               required
             />
           </div>
 
-          <div className="form-group">
+          <div className="input_field">
             <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
               name="email"
-              className="form-input"
-              value={email}
+              placeholder="Enter email address"
+              value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email address"
               required
             />
           </div>
 
-          <div className="form-group">
+          <div className="input_field">
             <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               name="password"
-              className="form-input"
-              value={password}
+              placeholder="Enter password"
+              value={formData.password}
               onChange={handleChange}
-              placeholder="Enter a password"
+              minLength="8"
               required
             />
           </div>
 
-          <button type="submit" className="register-button">
-            Register
-          </button>
+          {errorMessage && (
+            <p className="error_message">{errorMessage}</p>
+          )}
+
+          <div>
+            <button className="register_btn" type="submit">
+              Register
+            </button>
+          </div>
         </form>
 
-        <p className="register-login-link">
+        <p className="login_redirect">
           Already have an account? <Link to="/login">Login here</Link>
         </p>
       </div>
