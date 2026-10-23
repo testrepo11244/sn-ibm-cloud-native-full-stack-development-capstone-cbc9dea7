@@ -1,150 +1,165 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
+import "./Register.css";
+
+const djangoHost = process.env.REACT_APP_DJANGO_HOST || "http://localhost:8000";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    username: '',
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: ''
-  });
+  // Five input fields for the Sign-up page
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setErrorMessage("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage('');
+    const registerURL = `${djangoHost}/djangoapp/register`;
 
     try {
-      const response = await fetch('http://localhost:8000/djangoapp/register', {
-        method: 'POST',
+      const res = await fetch(registerURL, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: formData.username,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email: formData.email,
-          password: formData.password
-        })
+          username: username,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password,
+        }),
       });
 
-      const data = await response.json();
+      const json = await res.json();
 
-      if (response.status === 201 && data.status === 'authenticated') {
-        sessionStorage.setItem('username', data.username);
-        sessionStorage.setItem('isAuthenticated', true);
-        navigate('/dealers');
+      if (res.status === 201) {
+        // On successful registration, store the user details and log them in
+        localStorage.setItem("username", json.username);
+        if (json.token) {
+          localStorage.setItem("authToken", json.token);
+        }
+        navigate("/");
       } else {
-        setErrorMessage(data.error || 'Registration failed. Please try again.');
+        setErrorMessage(
+          json.error || "Registration failed. Please try again."
+        );
       }
     } catch (error) {
-      setErrorMessage('Unable to connect to the server. Please try again later.');
+      setErrorMessage("Network error. Please try again later.");
     }
   };
 
   return (
     <div className="register-container">
-      <div className="register-card">
-        <h1 className="register-title">Sign Up</h1>
-        <p className="register-subtitle">
-          Create your account to review dealerships
-        </p>
+      <Card className="register-card" sx={{ maxWidth: 450, margin: "auto", mt: 6 }}>
+        <CardContent>
+          <Typography variant="h5" component="h1" align="center" gutterBottom>
+            Sign Up
+          </Typography>
+          <Typography
+            variant="body2"
+            align="center"
+            color="textSecondary"
+            gutterBottom
+          >
+            Create your Best Cars Dealership account
+          </Typography>
 
-        {errorMessage && (
-          <div className="register-error" role="alert">
-            {errorMessage}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="register-form">
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
+          <form onSubmit={handleRegister}>
+            <TextField
+              fullWidth
+              required
               id="username"
               name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Enter a username"
-              required
+              label="Username"
+              variant="outlined"
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="first_name">First Name</label>
-            <input
-              type="text"
-              id="first_name"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-              placeholder="Enter your first name"
+            <TextField
+              fullWidth
               required
+              id="firstName"
+              name="firstName"
+              label="First Name"
+              variant="outlined"
+              margin="normal"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="last_name">Last Name</label>
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-              placeholder="Enter your last name"
+            <TextField
+              fullWidth
               required
+              id="lastName"
+              name="lastName"
+              label="Last Name"
+              variant="outlined"
+              margin="normal"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
+            <TextField
+              fullWidth
+              required
               id="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email address"
-              required
+              label="Email"
+              type="email"
+              variant="outlined"
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
+            <TextField
+              fullWidth
+              required
               id="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter a password"
-              required
+              label="Password"
+              type="password"
+              variant="outlined"
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-          </div>
 
-          <button type="submit" className="register-button">
-            Register
-          </button>
-        </form>
+            {errorMessage && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {errorMessage}
+              </Alert>
+            )}
 
-        <p className="register-footer">
-          Already have an account? <Link to="/login">Login here</Link>
-        </p>
-      </div>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Register
+            </Button>
+          </form>
+
+          <Typography variant="body2" align="center">
+            Already have an account? <Link to="/login">Login</Link>
+          </Typography>
+        </CardContent>
+      </Card>
     </div>
   );
 };
