@@ -1,99 +1,95 @@
-# Full Stack Application Development Capstone Project
+# Best Cars Dealership
 
-## Repository Name
-**xrwvm-fullstack_developer_capstone**
+**Repository Name:** `xrwvm-fullstack_developers_capstone`
 
-## Project Name
-**Dealerships — Full Stack Car Dealership Web Application (Django + React)**
+**Project Name:** Best Cars Dealership – Full Stack Car Dealership Application
 
 ---
 
-## Project Overview
-This capstone project is a full-stack car dealership web application built with a **Django** backend and a **React** frontend. The application allows users to browse car dealerships, filter dealers by state, view dealer details and reviews, perform sentiment analysis on reviews, post new reviews, and manage user authentication (sign-up, login, and logout).
+## 📋 Project Overview
 
-## Features
-- **User Authentication** — Sign-up, login, and logout functionality powered by Django's authentication framework.
-- **Dealer Listings** — View all dealerships or filter dealerships by state.
-- **Dealer Details** — View detailed information about each dealership along with its reviews.
-- **Reviews** — View and post reviews for any dealership.
-- **Sentiment Analysis** — IBM Watson NLU-based sentiment analysis of review text (positive / negative / neutral).
-- **Admin Panel** — Django admin interface for managing dealers, cars, and reviews.
-- **About Us & Contact Us** — Static pages with navigation, styling, and contact details.
-- **CI/CD Deployment** — Automated build and deployment using GitHub Actions.
+Best Cars Dealership is a full-stack web application developed as part of the **IBM Full Stack Application Development Capstone Project**. The application allows users to browse car dealerships, view dealer details and customer reviews, analyze review sentiment, and post their own reviews after signing up and logging in.
 
-## Technology Stack
+## 🏗️ Architecture
+
 | Layer      | Technology |
 |------------|------------|
-| Frontend   | React.js, HTML5, CSS3, JavaScript (ES6) |
-| Backend    | Django, Django REST Framework |
-| Database   | SQLite |
-| NLU        | IBM Watson Natural Language Understanding |
+| Frontend   | React.js (with Material-UI) |
+| Backend    | Django / Django REST Framework |
+| Database   | SQLite / MongoDB |
+| Sentiment Analysis | IBM Watson NLU / Django sentiment service |
 | CI/CD      | GitHub Actions |
 | Deployment | IBM Cloud Code Engine |
 
-## Project Structure
+## ✨ Features
+
+- **Dealer Listings** – View all dealerships, filter dealers by state
+- **Dealer Details** – View details and reviews for any dealer by ID
+- **User Authentication** – Sign up, login, and logout (Django auth)
+- **Post Reviews** – Authenticated users can post reviews for dealers
+- **Sentiment Analysis** – Reviews are analyzed for positive/negative/neutral sentiment
+- **Admin Panel** – Django admin for managing dealers, cars, and reviews
+- **CI/CD Pipeline** – Automated build, test, and deployment via GitHub Actions
+
+## 📁 Project Structure
+
 ```
-xrwvm-fullstack_developer_capstone/
+xrwvm-fullstack_developers_capstone/
 ├── server/
-│   ├── djangoapp/
-│   │   ├── templates/djangoapp/      # Django templates (About.html, Contact.html, etc.)
-│   │   ├── views.py                  # REST API endpoints
-│   │   ├── models.py                 # Dealer, Car, Review models
-│   │   ├── restapis.py               # External dealer/review service integration
-│   │   └── sentiment_analysis.py     # Watson NLU sentiment analysis
-│   ├── frontend/
+│   ├── djangoapp/              # Django application (models, views, templates)
+│   ├── server/                 # Django project settings
+│   ├── frontend/               # React application
 │   │   ├── src/
 │   │   │   ├── components/
-│   │   │   │   ├── Register/Register.jsx
-│   │   │   │   ├── Login/Login.jsx
-│   │   │   │   ├── Dealers/Dealers.jsx
-│   │   │   │   ├── Dealer/Dealer.jsx
-│   │   │   │   └── PostReview/PostReview.jsx
+│   │   │   │   ├── Register/   # Sign-up page
+│   │   │   │   ├── Login/      # Login page
+│   │   │   │   ├── Dealers/    # Dealers listing & details
+│   │   │   │   └── ...
 │   │   │   └── App.js
+│   │   └── static/             # Static HTML pages (About, Contact)
 │   ├── manage.py
 │   └── requirements.txt
-├── .github/workflows/server.yml      # CI/CD pipeline
+├── .github/workflows/          # GitHub Actions CI/CD workflow
 └── README.md
 ```
 
-## Setup and Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/xrwvm-fullstack_developer_capstone.git
-   cd xrwvm-fullstack_developer_capstone/server
-   ```
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Run database migrations:
-   ```bash
-   python manage.py migrate
-   ```
-4. Start the Django development server:
-   ```bash
-   python manage.py runserver
-   ```
-5. Build the React frontend:
-   ```bash
-   cd frontend
-   npm install
-   npm run build
-   ```
-6. Open the application at `http://localhost:8000`.
+## 🚀 Getting Started
 
-## API Endpoints
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/djangoapp/register` | POST | Register a new user |
-| `/djangoapp/login` | POST | Log in a user |
-| `/djangoapp/logout` | GET | Log out the current user |
-| `/djangoapp/get_dealers/` | GET | Fetch all dealers |
-| `/djangoapp/get_dealers/<state>` | GET | Fetch dealers by state |
-| `/djangoapp/dealer/<id>` | GET | Fetch dealer details by ID |
-| `/djangoapp/reviews/dealer/<id>` | GET | Fetch reviews for a dealer |
-| `/djangoapp/add_review` | POST | Post a review for a dealer |
-| `/djangoapp/analyze_review` | POST | Run sentiment analysis on review text |
+### Prerequisites
+- Python 3.9+
+- Node.js 14+
+- Git
 
-## Author
-IBM Full Stack Application Development Capstone Project — submitted for peer/AI evaluation.
+### Backend Setup
+```bash
+cd server
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+### Frontend Setup
+```bash
+cd server/frontend
+npm install
+npm start
+```
+
+## 🔗 Key Endpoints
+
+- `/djangoapp/get_dealers/` – Fetch all dealers
+- `/djangoapp/get_dealers/<state>/` – Fetch dealers by state
+- `/djangoapp/dealer/<id>/` – Fetch dealer details by ID
+- `/djangoapp/reviews/dealer/<id>/` – Fetch reviews for a dealer
+- `/djangoapp/add_review/` – Post a review
+- `/djangoapp/register` – Register a new user
+- `/djangoapp/login` – User login
+- `/djangoapp/logout` – User logout
+
+## 👤 Author
+
+Capstone learner – IBM Full Stack Application Development Professional Certificate
+
+## 📄 License
+
+This project is for educational purposes as part of the IBM Skills Network capstone.
